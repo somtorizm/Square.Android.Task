@@ -16,7 +16,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.vectorincng.squareandroidtaskvictor.utilities.MainTestRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -64,7 +64,6 @@ android {
 
 dependencies {
     implementation(libs.androidx.material3.android)
-    implementation(libs.androidx.lifecycle.runtime.compose)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
@@ -73,15 +72,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.material)
     implementation(libs.gson)
-
-    // Networking
-    implementation(libs.okhttp3)
-    implementation(libs.okhttp.logging)
     implementation(libs.okhttp3.logging.interceptor)
-
-    // Image loading
-    implementation(libs.coil.kt.compose)
-
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.retrofit2)
     implementation(libs.kotlinx.coroutines.android)
@@ -92,23 +83,10 @@ dependencies {
     implementation(libs.glide)
 
     testImplementation(libs.junit)
-    debugImplementation(libs.androidx.monitor)
-    kspAndroidTest(libs.hilt.android.compiler)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.arch.core.testing)
-    androidTestImplementation(libs.androidx.espresso.contrib)
+    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.espresso.intents)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.androidx.test.uiautomator)
-    androidTestImplementation(libs.androidx.work.testing)
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    androidTestImplementation(libs.guava)
-    androidTestImplementation(libs.hilt.android.testing)
-    androidTestImplementation(libs.accessibility.test.framework)
-    androidTestImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.junit)
-
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
