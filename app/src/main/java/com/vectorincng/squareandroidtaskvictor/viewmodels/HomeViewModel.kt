@@ -2,6 +2,7 @@ package com.vectorincng.squareandroidtaskvictor.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vectorincng.squareandroidtaskvictor.data.EmployeeType
 import com.vectorincng.squareandroidtaskvictor.data.EmployeesRepository
 import com.vectorincng.squareandroidtaskvictor.network.EmployeeFetcher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val refreshing = MutableStateFlow(false)
     private val _state = MutableStateFlow<HomeScreenUiState>(HomeScreenUiState.Loading)
+    private var employeeList : List<EmployeeFetcher.EmployeeDataResponse.Employee> = emptyList()
 
     fun refresh(force: Boolean = true) {
         viewModelScope.launch {
@@ -28,12 +30,26 @@ class HomeViewModel @Inject constructor(
                         }
                         is EmployeeFetcher.EmployeeDataResponse.Success -> {
                             _state.value = HomeScreenUiState.Ready(state.employees)
+                            employeeList = state.employees
                         }
                     }
                 }
             }
-            // TODO: look at result of runCatching and show any errors
             refreshing.value = false
+        }
+    }
+
+    fun sortListName(query: String?) {
+        if (state.value is HomeScreenUiState.Ready) {
+            val sortedEmployees = query?.let {
+                when (it) {
+                    "name" -> employeeList.sortedBy { employee -> employee.name }
+                    "team" -> employeeList.sortedBy { employee -> employee.team }
+                    else -> employeeList.sortedBy { employee -> employee.employeeType }
+                }
+            } ?: employeeList.sortedBy { employee -> employee.employeeType }
+
+            _state.value = HomeScreenUiState.Ready(sortedEmployees)
         }
     }
 
@@ -59,5 +75,4 @@ sealed interface HomeScreenUiState {
     data class Ready(
         val featuredEmployees: List<EmployeeFetcher.EmployeeDataResponse.Employee> = emptyList(),
     ) : HomeScreenUiState
-
 }

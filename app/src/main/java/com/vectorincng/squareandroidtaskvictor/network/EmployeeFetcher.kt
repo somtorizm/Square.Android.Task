@@ -3,6 +3,7 @@ package com.vectorincng.squareandroidtaskvictor.network
 import coil.network.HttpException
 import com.google.gson.Gson
 import com.vectorincng.squareandroidtaskvictor.data.Dispatcher
+import com.vectorincng.squareandroidtaskvictor.data.EmployeeType
 import com.vectorincng.squareandroidtaskvictor.data.EmployeesResponse
 import com.vectorincng.squareandroidtaskvictor.data.SquareAppDispatcher
 import java.util.concurrent.TimeUnit
@@ -66,7 +67,7 @@ class EmployeeFetcher @Inject constructor(
             if (employees.employees.isNotEmpty()) {
                 return EmployeeDataResponse.Success(
                     employees.employees.map {
-                        EmployeeDataResponse.Employee(it.name, it.imageUrl, it.biography, it.team)
+                        EmployeeDataResponse.Employee(it.id, it.name, it.imageUrl, it.biography, it.team, it.employeeType)
                     }
                 )
             }
@@ -85,10 +86,12 @@ class EmployeeFetcher @Inject constructor(
         ) : EmployeeDataResponse()
 
         data class Employee (
+            val id: String,
             val name: String,
             val imageUrl: String = "",
             val biography: String,
             val team: String,
+            val employeeType: EmployeeType
         )
     }
 
