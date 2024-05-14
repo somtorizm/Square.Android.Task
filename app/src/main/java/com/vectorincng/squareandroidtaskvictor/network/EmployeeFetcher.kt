@@ -38,12 +38,9 @@ class EmployeeFetcher @Inject constructor(
 
 
     operator fun invoke(): Flow<EmployeeDataResponse> {
-        // We use flatMapMerge here to achieve concurrent fetching/parsing of the feeds.
         return flow {
             emit(fetchJson())
         }.catch { e ->
-            // If an exception was caught while fetching the json, wrap it in
-            // an Error instance.
             emit(EmployeeDataResponse.Error(e))
         }
     }
