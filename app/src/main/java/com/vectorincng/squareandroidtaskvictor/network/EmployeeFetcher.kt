@@ -4,6 +4,7 @@ import android.util.Log
 import coil.network.HttpException
 import com.google.gson.Gson
 import com.vectorincng.squareandroidtaskvictor.data.Dispatcher
+import com.vectorincng.squareandroidtaskvictor.data.Employees
 import com.vectorincng.squareandroidtaskvictor.data.EmployeesResponse
 import com.vectorincng.squareandroidtaskvictor.data.SquareAppDispatcher
 import java.util.concurrent.TimeUnit
@@ -67,27 +68,24 @@ class EmployeeFetcher @Inject constructor(
 
         // If the network request wasn't successful, throw an exception
         if (!response.isSuccessful) throw HttpException(response)
-
-
         return withContext(ioDispatcher) {
             response.body!!.string().toEmployeesResponse()
         }
     }
 
     private fun String?.toEmployeesResponse(): EmployeeDataResponse {
-        this?.let {
+        this?.let { it ->
             val employees = Gson().fromJson(it, EmployeesResponse::class.java)
             Log.d("Employee", employees.employees.size.toString())
 
             if (employees.employees.isNotEmpty()) {
 
-                val employee = employees.employees[0]
-                Log.d("Employee", employee.name)
+                val employee = employees.employees
+
                 return EmployeeDataResponse.Success(
-                    employee.name,
-                    employee.imageUrl,
-                    employee.biography,
-                    employee.team
+                    employee.map {
+                        EmployeeDataResponse.Employee(it.name, it.imageUrl, it.biography, it.team)
+                    }
                 )
             }
         }
@@ -100,12 +98,16 @@ class EmployeeFetcher @Inject constructor(
             val throwable: Throwable?,
         ) : EmployeeDataResponse()
 
-        data class Success(
+        data class Employee (
             val name: String,
             val imageUrl: String = "",
             val biography: String,
             val team: String,
-        ) : EmployeeDataResponse()
+        )
+
+        data class Success(
+            val employees: List<Employee>
+        ): EmployeeDataResponse()
     }
 
     companion object {

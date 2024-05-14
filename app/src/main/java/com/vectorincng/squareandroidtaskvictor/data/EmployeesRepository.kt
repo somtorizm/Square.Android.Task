@@ -30,14 +30,13 @@ class EmployeesRepository @Inject constructor(
 
                         }
                         is EmployeeFetcher.EmployeeDataResponse.Success -> {
-                            Log.d("Hi",state.name)
+                            Log.d("Hi",state.employees.size.toString())
                         }
                         null -> {
 
                         }
                     }
                 }
-
             }
         }
     }
