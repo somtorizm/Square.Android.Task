@@ -1,4 +1,4 @@
-package com.vectorincng.squareandroidtaskvictor.home
+package com.vectorincng.squareandroidtaskvictor.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vectorincng.squareandroidtaskvictor.R
-import com.vectorincng.squareandroidtaskvictor.employeesdetails.EmployeesDetailsListItem
 import com.vectorincng.squareandroidtaskvictor.ui.theme.SquareAndroidTaskVictorTheme
 import com.vectorincng.squareandroidtaskvictor.viewmodels.HomeScreenUiState
 import com.vectorincng.squareandroidtaskvictor.viewmodels.HomeViewModel
@@ -36,7 +35,7 @@ fun HomeScreenReady(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel
         HomeScreenUiState.Loading -> HomeScreenLoading()
 
         is HomeScreenUiState.Ready -> {
-            Surface {
+            Surface(Modifier.padding(10.dp)) {
                 if (uiState.featuredEmployees.isNotEmpty()) {
                     LazyColumn {
                         items(uiState.featuredEmployees.size) { item ->
