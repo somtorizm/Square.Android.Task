@@ -1,13 +1,10 @@
 package com.vectorincng.squareandroidtaskvictor.data
 
 import android.util.Log
-import com.vectorincng.squareandroidtaskvictor.api.EmployeeService
 import com.vectorincng.squareandroidtaskvictor.network.EmployeeFetcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,12 +23,21 @@ class EmployeesRepository @Inject constructor(
 
             refreshingJob = scope.launch {
                 // Now fetch the podcasts, and add each to each store
-                employeeFetcher()
-                    .filter { it is EmployeeFetcher.EmployeeDataResponse.Success }
-                    .map { it as EmployeeFetcher.EmployeeDataResponse.Success }
-                    .collect { it ->
-                        Log.d("Result", it.name)
+                employeeFetcher().collect { state ->
+                    when(state){
+                        is EmployeeFetcher.EmployeeDataResponse.Error -> {
+                            Log.d("Hi","${state.throwable?.message}")
+
+                        }
+                        is EmployeeFetcher.EmployeeDataResponse.Success -> {
+                            Log.d("Hi",state.name)
+                        }
+                        null -> {
+
+                        }
                     }
+                }
+
             }
         }
     }

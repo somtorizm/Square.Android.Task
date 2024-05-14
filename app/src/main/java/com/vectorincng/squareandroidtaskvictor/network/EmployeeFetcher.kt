@@ -1,5 +1,6 @@
 package com.vectorincng.squareandroidtaskvictor.network
 
+import android.util.Log
 import coil.network.HttpException
 import com.google.gson.Gson
 import com.vectorincng.squareandroidtaskvictor.data.Dispatcher
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -44,7 +46,7 @@ class EmployeeFetcher @Inject constructor(
      * match the order of [feedUrls].
      */
 
-    operator fun invoke(): Flow<EmployeeDataResponse?> {
+    operator fun invoke(): Flow<EmployeeDataResponse> {
         // We use flatMapMerge here to achieve concurrent fetching/parsing of the feeds.
         return flow {
             emit(fetchJson())
@@ -55,7 +57,7 @@ class EmployeeFetcher @Inject constructor(
         }
     }
 
-    private suspend fun fetchJson(): EmployeeDataResponse? {
+    private suspend fun fetchJson(): EmployeeDataResponse {
         val request = Request.Builder()
             .url(Companion.BASE_URL)
             .cacheControl(cacheControl)
@@ -66,16 +68,21 @@ class EmployeeFetcher @Inject constructor(
         // If the network request wasn't successful, throw an exception
         if (!response.isSuccessful) throw HttpException(response)
 
-        val body = response.body?.string()
 
-        return body?.toEmployeesResponse()
+        return withContext(ioDispatcher) {
+            response.body!!.string().toEmployeesResponse()
+        }
     }
 
     private fun String?.toEmployeesResponse(): EmployeeDataResponse {
         this?.let {
-            val employees = Gson().fromJson(it, Array<EmployeesResponse>::class.java)
-            if (employees.isNotEmpty()) {
-                val employee = employees[0]
+            val employees = Gson().fromJson(it, EmployeesResponse::class.java)
+            Log.d("Employee", employees.employees.size.toString())
+
+            if (employees.employees.isNotEmpty()) {
+
+                val employee = employees.employees[0]
+                Log.d("Employee", employee.name)
                 return EmployeeDataResponse.Success(
                     employee.name,
                     employee.imageUrl,

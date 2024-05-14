@@ -46,16 +46,16 @@ fun EmployeesDetailsContent() {
 @Composable
 fun EmployeesDetailsListItem(employeesResponse: EmployeesResponse,) {
     Row(modifier = Modifier.padding(vertical = 8.dp)) {
-        EmployeesImage(imageUrl = employeesResponse.imageUrl,
+        EmployeesImage(imageUrl = employeesResponse.employees[0].imageUrl,
             imageHeight = 100.dp,
             modifier = Modifier)
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Column(modifier = Modifier.weight(1f)) {
+        /*Column(modifier = Modifier.weight(1f)) {
             Text(text = employeesResponse.name, style = MaterialTheme.typography.headlineMedium)
             Text(text = employeesResponse.biography, style = MaterialTheme.typography.bodyMedium)
-        }
+        }*/
     }
 }
 

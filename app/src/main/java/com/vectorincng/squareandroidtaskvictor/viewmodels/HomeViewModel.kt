@@ -1,5 +1,6 @@
 package com.vectorincng.squareandroidtaskvictor.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vectorincng.squareandroidtaskvictor.data.EmployeesRepository
@@ -36,7 +37,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-           refresh( )
+           refresh()
         }
 
         refresh(force = false)
