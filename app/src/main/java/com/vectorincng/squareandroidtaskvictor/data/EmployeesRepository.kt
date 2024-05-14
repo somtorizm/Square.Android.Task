@@ -25,7 +25,6 @@ class EmployeesRepositoryImpl @Inject constructor(
         } else if (force) {
 
             refreshingJob = scope.launch {
-                // Now fetch the podcasts, and add each to each store
                 employeeFetcher.invoke()
             }
 

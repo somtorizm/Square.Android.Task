@@ -2,10 +2,11 @@ package com.vectorincng.squareandroidtaskvictor.network
 
 import coil.network.HttpException
 import com.google.gson.Gson
+import com.google.gson.JsonParseException
 import com.vectorincng.squareandroidtaskvictor.data.Dispatcher
-import com.vectorincng.squareandroidtaskvictor.data.EmployeeType
 import com.vectorincng.squareandroidtaskvictor.data.EmployeesResponse
 import com.vectorincng.squareandroidtaskvictor.data.SquareAppDispatcher
+import com.vectorincng.squareandroidtaskvictor.utils.Extensions
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -62,18 +63,29 @@ class EmployeeFetcher @Inject constructor(
     }
 
     private fun String?.toEmployeesResponse(): EmployeeDataResponse {
-        this?.let { it ->
-            val employees = Gson().fromJson(it, EmployeesResponse::class.java)
-            if (employees.employees.isNotEmpty()) {
-                return EmployeeDataResponse.Success(
-                    employees.employees.map {
-                        EmployeeDataResponse.Employee(it.id, it.name, it.imageUrl, it.biography, it.team, it.employeeType)
-                    }
-                )
-            }
-        }
+        return this?.let { json ->
+            try {
+                val employees = Gson().fromJson(json, EmployeesResponse::class.java)
+                if (employees.employees.isEmpty()) return EmployeeDataResponse.Error(Throwable("No Employee data found"))
 
-        return EmployeeDataResponse.Error(Throwable("Failed to parse JSON or no employees found"))
+                val transformedEmployees = employees.employees.map { employee ->
+                    EmployeeDataResponse.Employee(
+                        employee.id ?:  throw IllegalArgumentException(),
+                        employee.name ?:  throw IllegalArgumentException(),
+                        employee.imageUrl ?:  throw IllegalArgumentException(),
+                        employee.biography ?:  throw IllegalArgumentException(),
+                        employee.team ?:  throw IllegalArgumentException(),
+                        employee.employeeType?:  throw IllegalArgumentException()
+                    )
+                }
+                EmployeeDataResponse.Success(transformedEmployees)
+            } catch (e: JsonParseException) {
+                EmployeeDataResponse.Error(Throwable("Failed to parse JSON"))
+            } catch (e: IllegalArgumentException) {
+                EmployeeDataResponse.Error(Throwable("Malformed Response data"))
+            }
+
+        } ?: EmployeeDataResponse.Error(Throwable("No data found"))
     }
 
     sealed class EmployeeDataResponse {
@@ -91,7 +103,7 @@ class EmployeeFetcher @Inject constructor(
             val imageUrl: String = "",
             val biography: String,
             val team: String,
-            val employeeType: EmployeeType
+            val employeeType: Extensions.EmployeeType
         )
     }
 
