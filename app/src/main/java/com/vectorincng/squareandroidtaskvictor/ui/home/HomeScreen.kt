@@ -20,6 +20,8 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,56 +50,77 @@ fun HomeScreenReady(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel
 
     val homeScreenUiState by viewModel.state.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState()
+    val pullToRefreshState = rememberPullToRefreshState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
+    if (pullToRefreshState.isRefreshing) {
+        viewModel.refresh(true)
+    }
+
     when(val uiState = homeScreenUiState) {
-        is HomeScreenUiState.Error -> HomeScreenError({
-            viewModel.refresh(true)
-        })
+        is HomeScreenUiState.Error -> {
+            HomeScreenError({
+                viewModel.refresh(true)
+            })
+
+            pullToRefreshState.endRefresh()
+        }
         HomeScreenUiState.Loading -> HomeScreenLoading()
 
         is HomeScreenUiState.Ready -> {
-            Surface(modifier.padding(10.dp)) {
-                Scaffold(
-                    floatingActionButton = {
-                        ExtendedFloatingActionButton(
-                            text = { Text("Sort list") },
-                            icon = { Icon(Icons.Filled.List, contentDescription = "") },
-                            onClick = {
-                                showBottomSheet = true
-                            }
-                        )
-                    },
-                    content = { innerPadding ->
-                        if (showBottomSheet) {
-                            ModalBottomSheet(
-                                onDismissRequest = {
-                                    showBottomSheet = false
-                                },
-                                sheetState = sheetState
-                            ) {
-                                BottomSheetDialog(onClick = {
-                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                        if (!sheetState.isVisible) {
-                                            showBottomSheet = false
-                                        }
-                                    }
-                                })
-                            }
-                        }
+            pullToRefreshState.endRefresh()
 
-                        if (uiState.featuredEmployees.isNotEmpty()) {
-                            LazyColumn(modifier.padding(innerPadding)) {
-                                items(uiState.featuredEmployees.size) { item ->
-                                    key(uiState.featuredEmployees[item].id) {
-                                        EmployeesDetailsListItem(uiState.featuredEmployees[item])
+            Surface(modifier.padding(10.dp)) {
+                Box(
+                    modifier = Modifier
+                        .nestedScroll(pullToRefreshState.nestedScrollConnection)
+                ) {
+                    Scaffold(
+                        floatingActionButton = {
+                            ExtendedFloatingActionButton(
+                                text = { Text("Sort list") },
+                                icon = { Icon(Icons.Filled.List, contentDescription = "") },
+                                onClick = {
+                                    showBottomSheet = true
+                                }
+                            )
+                        },
+                        content = { innerPadding ->
+                            if (showBottomSheet) {
+                                ModalBottomSheet(
+                                    onDismissRequest = {
+                                        showBottomSheet = false
+                                    },
+                                    sheetState = sheetState
+                                ) {
+                                    BottomSheetDialog(onClick = {
+                                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                            if (!sheetState.isVisible) {
+                                                showBottomSheet = false
+                                            }
+                                        }
+                                    })
+                                }
+                            }
+
+                            if (uiState.featuredEmployees.isNotEmpty()) {
+                                LazyColumn(modifier.padding(innerPadding)) {
+                                    items(uiState.featuredEmployees.size) { item ->
+                                        key(uiState.featuredEmployees[item].id) {
+                                            EmployeesDetailsListItem(uiState.featuredEmployees[item])
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                    })
+                        })
+
+                    PullToRefreshContainer(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        state = pullToRefreshState
+                    )
+                }
             }
         }
     }
