@@ -28,7 +28,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.vectorincng.squareandroidtaskvictor.data.Employees
+import com.vectorincng.squareandroidtaskvictor.data.EmployeesResponse
 
 @Composable
 fun EmployeesDetailsScreen() {
@@ -44,17 +44,17 @@ fun EmployeesDetailsContent() {
 
 
 @Composable
-fun EmployeesDetailsListItem(employees: Employees,) {
+fun EmployeesDetailsListItem(employeesResponse: EmployeesResponse,) {
     Row(modifier = Modifier.padding(vertical = 8.dp)) {
-        EmployeesImage(imageUrl = employees.imageUrl,
+        EmployeesImage(imageUrl = employeesResponse.imageUrl,
             imageHeight = 100.dp,
             modifier = Modifier)
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = employees.name, style = MaterialTheme.typography.headlineMedium)
-            Text(text = employees.biography, style = MaterialTheme.typography.bodyMedium)
+            Text(text = employeesResponse.name, style = MaterialTheme.typography.headlineMedium)
+            Text(text = employeesResponse.biography, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
