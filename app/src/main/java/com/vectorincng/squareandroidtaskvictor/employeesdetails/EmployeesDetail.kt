@@ -28,34 +28,22 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.vectorincng.squareandroidtaskvictor.data.EmployeesResponse
-
-@Composable
-fun EmployeesDetailsScreen() {
-
-}
-
+import com.vectorincng.squareandroidtaskvictor.network.EmployeeFetcher
 
 
 @Composable
-fun EmployeesDetailsContent() {
-
-}
-
-
-@Composable
-fun EmployeesDetailsListItem(employeesResponse: EmployeesResponse,) {
+fun EmployeesDetailsListItem(employees: EmployeeFetcher.EmployeeDataResponse.Employee) {
     Row(modifier = Modifier.padding(vertical = 8.dp)) {
-        EmployeesImage(imageUrl = employeesResponse.employees[0].imageUrl,
+        EmployeesImage(imageUrl = employees.imageUrl,
             imageHeight = 100.dp,
             modifier = Modifier)
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        /*Column(modifier = Modifier.weight(1f)) {
-            Text(text = employeesResponse.name, style = MaterialTheme.typography.headlineMedium)
-            Text(text = employeesResponse.biography, style = MaterialTheme.typography.bodyMedium)
-        }*/
+       Column(modifier = Modifier.weight(1f)) {
+            Text(text = employees.name, style = MaterialTheme.typography.headlineMedium)
+            Text(text = employees.biography, style = MaterialTheme.typography.bodyMedium)
+        }
     }
 }
 

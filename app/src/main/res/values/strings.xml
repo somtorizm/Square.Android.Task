@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Square Android Task Victor</string>
+    <string name="an_error_has_occurred">An error has occurred.</string>
+    <string name="connection_error_title">Connection error</string>
+    <string name="connection_error_message">Unable to fetch podcasts feeds.\nCheck your internet connection and try again.</string>
+    <string name="retry_label">Retry</string>
 </resources>

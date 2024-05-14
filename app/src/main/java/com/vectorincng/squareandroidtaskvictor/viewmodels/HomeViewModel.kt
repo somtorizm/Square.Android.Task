@@ -1,17 +1,14 @@
 package com.vectorincng.squareandroidtaskvictor.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vectorincng.squareandroidtaskvictor.data.EmployeesRepository
+import com.vectorincng.squareandroidtaskvictor.network.EmployeeFetcher
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-@OptIn(ExperimentalCoroutinesApi::class)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -24,10 +21,18 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 refreshing.value = true
-                employeesRepository.updatePodcasts(force)
+                employeesRepository.updateEmployeeList(force).collect { state ->
+                    when(state) {
+                        is EmployeeFetcher.EmployeeDataResponse.Error -> {
+                            _state.value = HomeScreenUiState.Error(state.throwable?.message)
+                        }
+                        is EmployeeFetcher.EmployeeDataResponse.Success -> {
+                            _state.value = HomeScreenUiState.Ready(state.employees)
+                        }
+                    }
+                }
             }
             // TODO: look at result of runCatching and show any errors
-
             refreshing.value = false
         }
     }
@@ -49,6 +54,10 @@ sealed interface HomeScreenUiState {
 
     data class Error(
         val errorMessage: String? = null
+    ) : HomeScreenUiState
+
+    data class Ready(
+        val featuredEmployees: List<EmployeeFetcher.EmployeeDataResponse.Employee> = emptyList(),
     ) : HomeScreenUiState
 
 }
