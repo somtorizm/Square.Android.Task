@@ -2,7 +2,6 @@ package com.vectorincng.squareandroidtaskvictor.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vectorincng.squareandroidtaskvictor.data.EmployeeType
 import com.vectorincng.squareandroidtaskvictor.data.EmployeesRepository
 import com.vectorincng.squareandroidtaskvictor.network.EmployeeFetcher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +22,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 refreshing.value = true
+                _state.value = HomeScreenUiState.Loading
+
                 employeesRepository.updateEmployeeList(force).collect { state ->
                     when(state) {
                         is EmployeeFetcher.EmployeeDataResponse.Error -> {

@@ -95,6 +95,7 @@ fun HomeScreenReady(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel
                                 }
                             }
                         }
+
                     })
             }
         }
@@ -153,20 +154,23 @@ fun BottomSheetDialog(onClick: () -> Unit, modifier: Modifier = Modifier, viewMo
             ) {
                 Button(onClick = {
                     viewModel.sortListName("name" )
+                    onClick()
                 }) {
                     Text(text = "Name")
                 }
 
                 Button(onClick = {
                     viewModel.sortListName("team")
+                    onClick()
                 }) {
                     Text(text = "Team")
                 }
 
                 Button(onClick = {
                     viewModel.sortListName(null)
+                    onClick()
                 }) {
-                    Text(text = "Type")
+                    Text(text = "Employee Type")
                 }
             }
         }
