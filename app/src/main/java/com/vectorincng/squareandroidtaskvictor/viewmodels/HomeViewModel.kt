@@ -1,14 +1,17 @@
 package com.vectorincng.squareandroidtaskvictor.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vectorincng.squareandroidtaskvictor.data.EmployeesRepository
-import com.vectorincng.squareandroidtaskvictor.network.EmployeeFetcher
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+@OptIn(ExperimentalCoroutinesApi::class)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -16,41 +19,16 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val refreshing = MutableStateFlow(false)
     private val _state = MutableStateFlow<HomeScreenUiState>(HomeScreenUiState.Loading)
-    private var employeeList : List<EmployeeFetcher.EmployeeDataResponse.Employee> = emptyList()
 
     fun refresh(force: Boolean = true) {
         viewModelScope.launch {
             runCatching {
                 refreshing.value = true
-                _state.value = HomeScreenUiState.Loading
-
-                employeesRepository.updateEmployeeList(force).collect { state ->
-                    when(state) {
-                        is EmployeeFetcher.EmployeeDataResponse.Error -> {
-                            _state.value = HomeScreenUiState.Error(state.throwable?.message)
-                        }
-                        is EmployeeFetcher.EmployeeDataResponse.Success -> {
-                            _state.value = HomeScreenUiState.Ready(state.employees)
-                            employeeList = state.employees
-                        }
-                    }
-                }
+                employeesRepository.updatePodcasts(force)
             }
+            // TODO: look at result of runCatching and show any errors
+
             refreshing.value = false
-        }
-    }
-
-    fun sortListName(query: String?) {
-        if (state.value is HomeScreenUiState.Ready) {
-            val sortedEmployees = query?.let {
-                when (it) {
-                    "name" -> employeeList.sortedBy { employee -> employee.name }
-                    "team" -> employeeList.sortedBy { employee -> employee.team }
-                    else -> employeeList.sortedBy { employee -> employee.employeeType }
-                }
-            } ?: employeeList.sortedBy { employee -> employee.employeeType }
-
-            _state.value = HomeScreenUiState.Ready(sortedEmployees)
         }
     }
 
@@ -73,7 +51,4 @@ sealed interface HomeScreenUiState {
         val errorMessage: String? = null
     ) : HomeScreenUiState
 
-    data class Ready(
-        val featuredEmployees: List<EmployeeFetcher.EmployeeDataResponse.Employee> = emptyList(),
-    ) : HomeScreenUiState
 }
