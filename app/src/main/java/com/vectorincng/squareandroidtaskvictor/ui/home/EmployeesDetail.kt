@@ -1,4 +1,4 @@
-package com.vectorincng.squareandroidtaskvictor.employeesdetails
+package com.vectorincng.squareandroidtaskvictor.ui.home
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.background
@@ -7,9 +7,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
@@ -28,37 +30,27 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.vectorincng.squareandroidtaskvictor.data.EmployeesResponse
-
-@Composable
-fun EmployeesDetailsScreen() {
-
-}
-
+import com.vectorincng.squareandroidtaskvictor.network.EmployeeFetcher
 
 
 @Composable
-fun EmployeesDetailsContent() {
-
-}
-
-
-@Composable
-fun EmployeesDetailsListItem(employeesResponse: EmployeesResponse,) {
-    Row(modifier = Modifier.padding(vertical = 8.dp)) {
-        EmployeesImage(imageUrl = employeesResponse.employees[0].imageUrl,
+fun EmployeesDetailsListItem(employees: EmployeeFetcher.EmployeeDataResponse.Employee) {
+    Row(modifier = Modifier.padding(vertical = 10.dp)) {
+        EmployeesImage(imageUrl = employees.imageUrl,
             imageHeight = 100.dp,
             modifier = Modifier)
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.width(10.dp))
 
-        /*Column(modifier = Modifier.weight(1f)) {
-            Text(text = employeesResponse.name, style = MaterialTheme.typography.headlineMedium)
-            Text(text = employeesResponse.biography, style = MaterialTheme.typography.bodyMedium)
-        }*/
+       Column(modifier = Modifier.weight(1f)) {
+           Text(text = employees.name, style = MaterialTheme.typography.bodyMedium)
+           Spacer(modifier = Modifier.height(10.dp))
+           Text(text = employees.biography, style = MaterialTheme.typography.bodySmall)
+           Spacer(modifier = Modifier.height(10.dp))
+           Text(text = "Team: ${employees.team}", style = MaterialTheme.typography.labelSmall)
+        }
     }
 }
-
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -71,23 +63,22 @@ private fun EmployeesImage(
     var isLoading by remember { mutableStateOf(true) }
     Box(
         modifier
-            .fillMaxWidth()
+            .width(100.dp)
             .height(imageHeight)
     ) {
         if (isLoading) {
-            // TODO: Update this implementation once Glide releases a version
-            // that contains this feature: https://github.com/bumptech/glide/pull/4934
             Box(
                 Modifier
                     .fillMaxSize()
                     .background(placeholderColor)
             )
         }
+
         GlideImage(
             model = imageUrl,
             contentDescription = null,
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize().clip(CircleShape),
             contentScale = ContentScale.Crop,
         ) {
             it.addListener(object : RequestListener<Drawable> {
