@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -63,7 +62,7 @@ fun HomeScreenReady(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel
         is HomeScreenUiState.Error -> {
             HomeScreenError({
                 viewModel.refresh(true)
-            }, errorMessage = uiState.errorMessage.toString())
+            })
 
             pullToRefreshState.endRefresh()
         }
@@ -105,13 +104,16 @@ fun HomeScreenReady(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel
                                 }
                             }
 
-                            LazyColumn(modifier.padding(innerPadding)) {
-                                items(uiState.featuredEmployees.size) { item ->
-                                    key(uiState.featuredEmployees[item].id) {
-                                        EmployeesDetailsListItem(uiState.featuredEmployees[item])
+                            if (uiState.featuredEmployees.isNotEmpty()) {
+                                LazyColumn(modifier.padding(innerPadding)) {
+                                    items(uiState.featuredEmployees.size) { item ->
+                                        key(uiState.featuredEmployees[item].id) {
+                                            EmployeesDetailsListItem(uiState.featuredEmployees[item])
+                                        }
                                     }
                                 }
                             }
+
                         })
 
                     PullToRefreshContainer(
@@ -136,23 +138,16 @@ private fun HomeScreenLoading(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun HomeScreenError(onRetry: () -> Unit, modifier: Modifier = Modifier, errorMessage: String) {
+private fun HomeScreenError(onRetry: () -> Unit, modifier: Modifier = Modifier) {
     Surface(modifier = modifier) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize(),
         ) {
-            Icon(imageVector = Icons.Filled.Info, contentDescription = "Error")
-
             Text(
                 text = stringResource(id = R.string.an_error_has_occurred),
-                modifier = Modifier.padding(10.dp)
-            )
-
-            Text(
-                text = errorMessage,
-                modifier = Modifier.padding(10.dp)
+                modifier = Modifier.padding(16.dp)
             )
             Button(onClick = onRetry) {
                 Text(text = stringResource(id = R.string.retry_label))
@@ -210,6 +205,6 @@ fun BottomSheetDialog(onClick: () -> Unit, modifier: Modifier = Modifier, viewMo
 @Composable
 fun HomeScreenErrorPreview() {
     SquareAndroidTaskVictorTheme {
-        HomeScreenError(onRetry = {}, errorMessage = "No network")
+        HomeScreenError(onRetry = {})
     }
 }

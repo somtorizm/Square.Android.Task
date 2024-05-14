@@ -4,6 +4,8 @@ import android.content.Context
 import coil.ImageLoader
 import com.vectorincng.squareandroidtaskvictor.BuildConfig
 import com.vectorincng.squareandroidtaskvictor.data.Dispatcher
+import com.vectorincng.squareandroidtaskvictor.data.EmployeesRepository
+import com.vectorincng.squareandroidtaskvictor.data.EmployeesRepositoryImpl
 import com.vectorincng.squareandroidtaskvictor.data.SquareAppDispatcher
 import dagger.Module
 import dagger.Provides
@@ -50,4 +52,10 @@ object DataDiModule {
     @Dispatcher(SquareAppDispatcher.Main)
     @Singleton
     fun provideMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
+
+    @Provides
+    @Singleton
+    fun provideEmployeeRepository(employeesRepository: EmployeesRepositoryImpl) : EmployeesRepository {
+        return  employeesRepository
+    }
 }
