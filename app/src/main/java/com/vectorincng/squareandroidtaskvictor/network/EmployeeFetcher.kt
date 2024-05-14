@@ -1,17 +1,19 @@
 package com.vectorincng.squareandroidtaskvictor.network
 
+import android.util.Log
 import coil.network.HttpException
 import com.google.gson.Gson
-import com.google.gson.JsonParseException
 import com.vectorincng.squareandroidtaskvictor.data.Dispatcher
+import com.vectorincng.squareandroidtaskvictor.data.Employees
 import com.vectorincng.squareandroidtaskvictor.data.EmployeesResponse
 import com.vectorincng.squareandroidtaskvictor.data.SquareAppDispatcher
-import com.vectorincng.squareandroidtaskvictor.utils.Extensions
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
@@ -19,7 +21,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 /**
- * A class which fetches Json response.
+ * A class which fetches some selected podcast RSS feeds.
  *
  * @param okHttpClient [OkHttpClient] to use for network requests
  * @param ioDispatcher [CoroutineDispatcher] to use for running fetch requests.
@@ -30,7 +32,7 @@ class EmployeeFetcher @Inject constructor(
 ) {
 
     /**
-     * implement HTTP caching appropriately.
+     * It seems that most podcast hosts do not implement HTTP caching appropriately.
      * Instead of fetching data on every app open, we instead allow the use of 'stale'
      * network responses (up to 8 hours).
      */
@@ -38,18 +40,27 @@ class EmployeeFetcher @Inject constructor(
         CacheControl.Builder().maxStale(8, TimeUnit.HOURS).build()
     }
 
+    /**
+     * Returns a [Flow] which fetches each podcast feed and emits it in turn.
+     *
+     * The feeds are fetched concurrently, meaning that the resulting emission order may not
+     * match the order of [feedUrls].
+     */
 
     operator fun invoke(): Flow<EmployeeDataResponse> {
+        // We use flatMapMerge here to achieve concurrent fetching/parsing of the feeds.
         return flow {
             emit(fetchJson())
         }.catch { e ->
+            // If an exception was caught while fetching the podcast, wrap it in
+            // an Error instance.
             emit(EmployeeDataResponse.Error(e))
         }
     }
 
     private suspend fun fetchJson(): EmployeeDataResponse {
         val request = Request.Builder()
-            .url(BASE_URL)
+            .url(Companion.BASE_URL)
             .cacheControl(cacheControl)
             .build()
 
@@ -63,29 +74,18 @@ class EmployeeFetcher @Inject constructor(
     }
 
     private fun String?.toEmployeesResponse(): EmployeeDataResponse {
-        return this?.let { json ->
-            try {
-                val employees = Gson().fromJson(json, EmployeesResponse::class.java)
-                if (employees.employees.isEmpty()) return EmployeeDataResponse.Error(Throwable("No Employee data found"))
-
-                val transformedEmployees = employees.employees.map { employee ->
-                    EmployeeDataResponse.Employee(
-                        employee.id ?:  throw IllegalArgumentException(),
-                        employee.name ?:  throw IllegalArgumentException(),
-                        employee.imageUrl ?:  throw IllegalArgumentException(),
-                        employee.biography ?:  throw IllegalArgumentException(),
-                        employee.team ?:  throw IllegalArgumentException(),
-                        employee.employeeType?:  throw IllegalArgumentException()
-                    )
-                }
-                EmployeeDataResponse.Success(transformedEmployees)
-            } catch (e: JsonParseException) {
-                EmployeeDataResponse.Error(Throwable("Failed to parse JSON"))
-            } catch (e: IllegalArgumentException) {
-                EmployeeDataResponse.Error(Throwable("Malformed Response data"))
+        this?.let { it ->
+            val employees = Gson().fromJson(it, EmployeesResponse::class.java)
+            if (employees.employees.isNotEmpty()) {
+                return EmployeeDataResponse.Success(
+                    employees.employees.map {
+                        EmployeeDataResponse.Employee(it.name, it.imageUrl, it.biography, it.team)
+                    }
+                )
             }
+        }
 
-        } ?: EmployeeDataResponse.Error(Throwable("No data found"))
+        return EmployeeDataResponse.Error(Throwable("Failed to parse JSON or no employees found"))
     }
 
     sealed class EmployeeDataResponse {
@@ -98,12 +98,10 @@ class EmployeeFetcher @Inject constructor(
         ) : EmployeeDataResponse()
 
         data class Employee (
-            val id: String,
             val name: String,
             val imageUrl: String = "",
             val biography: String,
             val team: String,
-            val employeeType: Extensions.EmployeeType
         )
     }
 
