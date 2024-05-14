@@ -65,12 +65,14 @@ private fun EmployeesImage(
         modifier
             .width(100.dp)
             .height(imageHeight)
+            .clip(CircleShape)
     ) {
         if (isLoading) {
             Box(
                 Modifier
                     .fillMaxSize()
                     .background(placeholderColor)
+                    .clip(CircleShape)
             )
         }
 
@@ -78,7 +80,7 @@ private fun EmployeesImage(
             model = imageUrl,
             contentDescription = null,
             modifier = Modifier
-                .fillMaxSize().clip(CircleShape),
+                .fillMaxSize(),
             contentScale = ContentScale.Crop,
         ) {
             it.addListener(object : RequestListener<Drawable> {
