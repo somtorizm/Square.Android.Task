@@ -72,7 +72,15 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.material)
     implementation(libs.gson)
+
+    // Networking
+    implementation(libs.okhttp3)
+    implementation(libs.okhttp.logging)
     implementation(libs.okhttp3.logging.interceptor)
+
+    // Image loading
+    implementation(libs.coil.kt.compose)
+
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.retrofit2)
     implementation(libs.kotlinx.coroutines.android)
