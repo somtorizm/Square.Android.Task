@@ -76,14 +76,9 @@ class EmployeeFetcher @Inject constructor(
     private fun String?.toEmployeesResponse(): EmployeeDataResponse {
         this?.let { it ->
             val employees = Gson().fromJson(it, EmployeesResponse::class.java)
-            Log.d("Employee", employees.employees.size.toString())
-
             if (employees.employees.isNotEmpty()) {
-
-                val employee = employees.employees
-
                 return EmployeeDataResponse.Success(
-                    employee.map {
+                    employees.employees.map {
                         EmployeeDataResponse.Employee(it.name, it.imageUrl, it.biography, it.team)
                     }
                 )
@@ -94,6 +89,10 @@ class EmployeeFetcher @Inject constructor(
     }
 
     sealed class EmployeeDataResponse {
+        data class Success(
+            val employees: List<Employee>
+        ): EmployeeDataResponse()
+
         data class Error(
             val throwable: Throwable?,
         ) : EmployeeDataResponse()
@@ -104,10 +103,6 @@ class EmployeeFetcher @Inject constructor(
             val biography: String,
             val team: String,
         )
-
-        data class Success(
-            val employees: List<Employee>
-        ): EmployeeDataResponse()
     }
 
     companion object {
