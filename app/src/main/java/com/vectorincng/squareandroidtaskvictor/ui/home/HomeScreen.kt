@@ -70,7 +70,6 @@ fun HomeScreenReady(modifier: Modifier, viewModel: HomeViewModel = hiltViewModel
 
         is HomeScreenUiState.Ready -> {
             pullToRefreshState.endRefresh()
-
             Surface(modifier.padding(10.dp)) {
                 Box(
                     modifier = Modifier

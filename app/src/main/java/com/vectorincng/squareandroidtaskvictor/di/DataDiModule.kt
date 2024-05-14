@@ -39,7 +39,7 @@ object DataDiModule {
     fun provideImageLoader(
         @ApplicationContext context: Context
     ): ImageLoader = ImageLoader.Builder(context)
-        // Disable `Cache-Control` header support as some podcast images disable disk caching.
+        // Disable `Cache-Control` header support as some images disable disk caching.
         .respectCacheHeaders(false)
         .build()
 
