@@ -23,7 +23,6 @@ class EmployeesRepositoryImpl @Inject constructor(
         if (refreshingJob?.isActive == true) {
             refreshingJob?.join()
         } else if (force) {
-
             refreshingJob = scope.launch {
                 employeeFetcher.invoke()
             }

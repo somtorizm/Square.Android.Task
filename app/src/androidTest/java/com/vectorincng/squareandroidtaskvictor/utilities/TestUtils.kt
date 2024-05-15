@@ -24,6 +24,4 @@ val testEmployees = arrayListOf(
 
 )
 
-val testEmployee = testEmployees[0]
-
 

@@ -23,9 +23,10 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 refreshing.value = true
-                _state.value = HomeScreenUiState.Loading
+            _state.value = HomeScreenUiState.Loading
+            refreshing.value = true
 
-                employeesRepository.updateEmployeeList(force).collect { state ->
+            employeesRepository.updateEmployeeList(force).collect { state ->
                     when(state) {
                         is EmployeeFetcher.EmployeeDataResponse.Error -> {
                             _state.value = HomeScreenUiState.Error(state.throwable?.message)
@@ -38,7 +39,7 @@ class HomeViewModel @Inject constructor(
                 }
             }
             refreshing.value = false
-        }
+    }
     }
 
     fun sortListName(query: String?) {
