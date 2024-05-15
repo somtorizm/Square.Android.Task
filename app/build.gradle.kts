@@ -16,7 +16,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.vectorincng.squareandroidtaskvictor.utilities.MainTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -92,10 +92,23 @@ dependencies {
     implementation(libs.glide)
 
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    debugImplementation(libs.androidx.monitor)
+    kspAndroidTest(libs.hilt.android.compiler)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.arch.core.testing)
+    androidTestImplementation(libs.androidx.espresso.contrib)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.espresso.intents)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.uiautomator)
+    androidTestImplementation(libs.androidx.work.testing)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.guava)
+    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.accessibility.test.framework)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
