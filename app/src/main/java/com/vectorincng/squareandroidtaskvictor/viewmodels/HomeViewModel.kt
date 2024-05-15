@@ -3,6 +3,7 @@ package com.vectorincng.squareandroidtaskvictor.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vectorincng.squareandroidtaskvictor.data.EmployeesRepository
+import com.vectorincng.squareandroidtaskvictor.data.Employee
 import com.vectorincng.squareandroidtaskvictor.network.EmployeeFetcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val refreshing = MutableStateFlow(false)
     private val _state = MutableStateFlow<HomeScreenUiState>(HomeScreenUiState.Loading)
-    private var employeeList : List<EmployeeFetcher.EmployeeDataResponse.Employee> = emptyList()
+    private var employeeList : List<Employee> = emptyList()
 
     fun refresh(force: Boolean = true) {
         viewModelScope.launch {
@@ -74,6 +75,6 @@ sealed interface HomeScreenUiState {
     ) : HomeScreenUiState
 
     data class Ready(
-        val featuredEmployees: List<EmployeeFetcher.EmployeeDataResponse.Employee> = emptyList(),
+        val featuredEmployees: List<Employee> = emptyList(),
     ) : HomeScreenUiState
 }

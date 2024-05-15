@@ -4,6 +4,7 @@ package com.vectorincng.squareandroidtaskvictor.utilities
 import androidx.lifecycle.LiveData
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 /**
  * Helper method for testing LiveData objects, from
@@ -23,5 +24,5 @@ fun <T> getValue(liveData: LiveData<T>): T {
     latch.await(2, TimeUnit.SECONDS)
 
     @Suppress("UNCHECKED_CAST")
-    return data[0] as T
+    return data[0] as T ?: throw TimeoutException("LiveData value not set")
 }

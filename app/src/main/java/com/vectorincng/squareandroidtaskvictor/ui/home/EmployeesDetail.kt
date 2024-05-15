@@ -30,11 +30,11 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.vectorincng.squareandroidtaskvictor.network.EmployeeFetcher
+import com.vectorincng.squareandroidtaskvictor.data.Employee
 
 
 @Composable
-fun EmployeesDetailsListItem(employees: EmployeeFetcher.EmployeeDataResponse.Employee) {
+fun EmployeesDetailsListItem(employees: Employee) {
     Row(modifier = Modifier.padding(vertical = 10.dp)) {
         EmployeesImage(imageUrl = employees.imageUrl,
             imageHeight = 100.dp,

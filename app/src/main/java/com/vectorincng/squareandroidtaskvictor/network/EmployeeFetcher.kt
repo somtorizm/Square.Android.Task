@@ -4,9 +4,9 @@ import coil.network.HttpException
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.vectorincng.squareandroidtaskvictor.data.Dispatcher
+import com.vectorincng.squareandroidtaskvictor.data.Employee
 import com.vectorincng.squareandroidtaskvictor.data.EmployeesResponse
 import com.vectorincng.squareandroidtaskvictor.data.SquareAppDispatcher
-import com.vectorincng.squareandroidtaskvictor.utils.Extensions
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -69,7 +69,7 @@ class EmployeeFetcher @Inject constructor(
                 if (employees.employees.isEmpty()) return EmployeeDataResponse.Error(Throwable("No Employee data found"))
 
                 val transformedEmployees = employees.employees.map { employee ->
-                    EmployeeDataResponse.Employee(
+                    Employee(
                         employee.id ?:  throw IllegalArgumentException(),
                         employee.name ?:  throw IllegalArgumentException(),
                         employee.imageUrl ?:  throw IllegalArgumentException(),
@@ -96,15 +96,6 @@ class EmployeeFetcher @Inject constructor(
         data class Error(
             val throwable: Throwable?,
         ) : EmployeeDataResponse()
-
-        data class Employee (
-            val id: String,
-            val name: String,
-            val imageUrl: String = "",
-            val biography: String,
-            val team: String,
-            val employeeType: Extensions.EmployeeType
-        )
     }
 
     companion object {
