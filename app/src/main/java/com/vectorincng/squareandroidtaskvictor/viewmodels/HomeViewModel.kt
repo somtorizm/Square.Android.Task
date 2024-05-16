@@ -18,6 +18,10 @@ class HomeViewModel @Inject constructor(
     private val _state = MutableStateFlow<HomeScreenUiState>(HomeScreenUiState.Loading)
     private var employeeList : List<EmployeeFetcher.EmployeeDataResponse.Employee> = emptyList()
 
+    init {
+        refresh()
+    }
+
     fun refresh(force: Boolean = true) {
         viewModelScope.launch {
             runCatching {
@@ -56,14 +60,6 @@ class HomeViewModel @Inject constructor(
 
     val state: StateFlow<HomeScreenUiState>
         get() = _state
-
-    init {
-        viewModelScope.launch {
-           refresh()
-        }
-
-        refresh(force = false)
-    }
 }
 
 sealed interface HomeScreenUiState {
