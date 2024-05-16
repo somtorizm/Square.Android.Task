@@ -58,6 +58,16 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
+        }
+    }
+
+    testOptions {
+        packagingOptions {
+            jniLibs {
+                useLegacyPackaging = true
+            }
         }
     }
 }
@@ -92,6 +102,15 @@ dependencies {
     implementation(libs.glide)
 
     testImplementation(libs.junit)
+    testImplementation(libs.turbine.android)
+    testImplementation(libs.mock.mockk.android)
+    testImplementation(libs.mock.mockk.agent)
+
+
+    androidTestImplementation(libs.turbine.android)
+    androidTestImplementation(libs.mock.mockk.android)
+    androidTestImplementation(libs.mock.mockk.agent)
+
     debugImplementation(libs.androidx.monitor)
     kspAndroidTest(libs.hilt.android.compiler)
     androidTestImplementation(platform(libs.androidx.compose.bom))
